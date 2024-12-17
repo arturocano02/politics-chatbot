@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Politics Chatbot</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Left Chatbot Interface -->
+        <div class="left-panel">
+            <h1>Discuss with Your Political Representative</h1>
+            <div class="chat-window" id="chat-window">
+                <!-- Messages will appear here -->
+            </div>
+            <div class="chat-input">
+                <input type="text" id="user-input" placeholder="Type your thoughts...">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+
+        <!-- Right Aggregated Responses -->
+        <div class="right-panel">
+            <h1>UK Public Sentiment</h1>
+            <div class="stats">
+                <p><strong>Live User Count:</strong> <span id="user-count">0</span></p>
+            </div>
+            <div id="bubble-container">
+                <!-- Visualized bubbles will appear here -->
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
