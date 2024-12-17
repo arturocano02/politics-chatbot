@@ -21,11 +21,11 @@ console.log("Firebase initialized successfully.");
 
 // Generate a unique username
 function generateUniqueUsername() {
-    const randomId = Math.floor(1000 + Math.random() * 9000); // Generate random 4-digit number
+    const randomId = Math.floor(1000 + Math.random() * 9000);
     return `User${randomId}`;
 }
 
-// Prompt for username
+// Prompt for username and update the title
 let username = "";
 document.addEventListener("DOMContentLoaded", () => {
     console.log("Document loaded. Prompting for username...");
@@ -38,10 +38,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     console.log("Username set to:", username);
 
-    // Update the title with the username
-    const leftPanelTitle = document.createElement("h2");
-    leftPanelTitle.textContent = `${username} chatting with Political Representative`;
-    document.querySelector(".left-panel").prepend(leftPanelTitle);
+    // Update the title dynamically
+    const chatTitle = document.getElementById("chat-title");
+    chatTitle.textContent = `${username} chatting with Political Representative`;
 });
 
 // Function to send a message
