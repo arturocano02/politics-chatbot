@@ -11,21 +11,21 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = firebase.initializeApp(firebaseConfig);
+firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
-// Prompt user for username
+// Prompt for username
 let username = "";
 while (!username) {
     username = prompt("Enter a username to start the chat:");
 }
 
-// Function to send a message and save to Firebase
+// Function to send a message
 function sendMessage() {
     const userInput = document.getElementById("user-input").value.trim();
     if (!userInput) return;
 
-    // Save to Firebase
+    // Save the message to Firebase
     const userRef = database.ref("responses/" + username);
     userRef.push({
         message: userInput,
@@ -47,14 +47,14 @@ function sendMessage() {
 // Function to display aggregated data
 function displayAggregatedData() {
     const bubbleContainer = document.getElementById("bubble-container");
-    const topics = {}; // To hold keyword counts
+    const topics = {};
 
     // Fetch data from Firebase
     database.ref("responses").on("value", (snapshot) => {
         const data = snapshot.val();
         if (!data) return;
 
-        // Analyze messages for keywords
+        // Analyze keywords
         for (let user in data) {
             for (let response in data[user]) {
                 const message = data[user][response].message.toLowerCase();
@@ -81,5 +81,5 @@ function displayAggregatedData() {
     });
 }
 
-// Call function to display aggregated data
+// Call the function to display data
 displayAggregatedData();
