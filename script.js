@@ -1,4 +1,4 @@
-// Your Firebase Config
+// Your Firebase Configuration
 const firebaseConfig = {
     apiKey: "AIzaSyBImTB7fyMBzhY0etBFlrT89IoIo50SK0Q",
     authDomain: "politics-chatbot.firebaseapp.com",
@@ -14,18 +14,21 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
-// Prompt for username
+// Prompt for username when the page loads
 let username = "";
-while (!username) {
-    username = prompt("Enter a username to start the chat:");
-}
+document.addEventListener("DOMContentLoaded", () => {
+    while (!username) {
+        username = prompt("Enter a username to start the chat:");
+        if (!username) alert("Username cannot be empty!");
+    }
+});
 
 // Function to send a message
 function sendMessage() {
     const userInput = document.getElementById("user-input").value.trim();
     if (!userInput) return;
 
-    // Save the message to Firebase
+    // Save message to Firebase
     const userRef = database.ref("responses/" + username);
     userRef.push({
         message: userInput,
@@ -40,11 +43,11 @@ function sendMessage() {
     const botResponse = "Thank you for sharing!";
     chatWindow.innerHTML += `<p><strong>Bot:</strong> ${botResponse}</p>`;
 
-    // Clear input
+    // Clear input field
     document.getElementById("user-input").value = "";
 }
 
-// Function to display aggregated data
+// Function to display aggregated data dynamically
 function displayAggregatedData() {
     const bubbleContainer = document.getElementById("bubble-container");
     const topics = {};
@@ -54,7 +57,7 @@ function displayAggregatedData() {
         const data = snapshot.val();
         if (!data) return;
 
-        // Analyze keywords
+        // Analyze and count keywords in responses
         for (let user in data) {
             for (let response in data[user]) {
                 const message = data[user][response].message.toLowerCase();
@@ -66,20 +69,20 @@ function displayAggregatedData() {
             }
         }
 
-        // Update bubbles
+        // Update the bubble visualization
         bubbleContainer.innerHTML = "";
         for (let topic in topics) {
-            const size = 50 + topics[topic] * 20;
+            const size = 50 + topics[topic] * 20; // Dynamic bubble size
             const bubble = `<div class="bubble" style="width:${size}px; height:${size}px;">
                                 ${topic} (${topics[topic]})
                             </div>`;
             bubbleContainer.innerHTML += bubble;
         }
 
-        // Update user count
+        // Update live user count
         document.getElementById("user-count").textContent = Object.keys(data).length;
     });
 }
 
-// Call the function to display data
+// Call the function to display aggregated data
 displayAggregatedData();
