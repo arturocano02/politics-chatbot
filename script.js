@@ -1,3 +1,5 @@
+console.log("Script loaded. Checking Firebase availability...");
+
 // Firebase Configuration
 const firebaseConfig = {
     apiKey: "AIzaSyBImTB7fyMBzhY0etBFlrT89IoIo50SK0Q",
@@ -10,30 +12,53 @@ const firebaseConfig = {
     measurementId: "G-M8YR67RG2V"
 };
 
-// Initialize Firebase
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
+// Debugging: Check if Firebase is loaded
+if (typeof firebase === "undefined") {
+    console.error("Firebase is not loaded. Check the script order.");
+} else {
+    console.log("Firebase object is available.");
 }
+
+// Initialize Firebase
+try {
+    firebase.initializeApp(firebaseConfig);
+    console.log("Firebase initialized successfully.");
+} catch (error) {
+    console.error("Firebase initialization error:", error);
+}
+
 const database = firebase.database();
+console.log("Firebase database initialized.");
 
 // Prompt for username
 let username = "";
 document.addEventListener("DOMContentLoaded", () => {
+    console.log("Document loaded. Prompting for username...");
     while (!username) {
         username = prompt("Enter a username to start the chat:");
-        if (!username) alert("Username cannot be empty!");
+        if (!username) console.warn("Username is empty. Prompting again...");
     }
+    console.log("Username set to:", username);
 });
 
 // Function to send a message
 function sendMessage() {
     const userInput = document.getElementById("user-input").value.trim();
-    if (!userInput) return;
+    console.log("Send button clicked. User input:", userInput);
 
-    // Save message to Firebase
+    if (!userInput) {
+        console.warn("Input is empty. No message sent.");
+        return;
+    }
+
+    console.log("Saving message to Firebase...");
     database.ref("responses/" + username).push({
         message: userInput,
         timestamp: Date.now()
+    }).then(() => {
+        console.log("Message saved successfully.");
+    }).catch((error) => {
+        console.error("Error saving message:", error);
     });
 
     // Display message
@@ -42,13 +67,16 @@ function sendMessage() {
     document.getElementById("user-input").value = "";
 }
 
-// Display Aggregated Data
+// Function to display aggregated data
 function displayAggregatedData() {
+    console.log("Fetching aggregated data from Firebase...");
     const bubbleContainer = document.getElementById("bubble-container");
     const topics = {};
 
     database.ref("responses").on("value", (snapshot) => {
         const data = snapshot.val();
+        console.log("Data received from Firebase:", data);
+
         if (!data) return;
 
         for (let user in data) {
@@ -62,6 +90,9 @@ function displayAggregatedData() {
             }
         }
 
+        console.log("Processed topics:", topics);
+
+        // Update bubbles
         bubbleContainer.innerHTML = "";
         for (let topic in topics) {
             const size = 50 + topics[topic] * 20;
@@ -69,7 +100,9 @@ function displayAggregatedData() {
                                             ${topic} (${topics[topic]})
                                           </div>`;
         }
+
         document.getElementById("user-count").textContent = Object.keys(data).length;
+        console.log("User count updated:", Object.keys(data).length);
     });
 }
 
