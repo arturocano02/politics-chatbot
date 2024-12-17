@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Politics Chatbot</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Firebase SDK Scripts -->
+    <!-- Load Firebase SDK (Ensure this is correct) -->
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js"></script>
 </head>
 <body>
     <div class="container">
-        <!-- Left Panel: Chatbot -->
+        <!-- Left Panel -->
         <div class="left-panel">
             <h1>Discuss with Your Political Representative</h1>
             <div class="chat-window" id="chat-window"></div>
@@ -20,7 +20,7 @@
                 <button onclick="sendMessage()">Send</button>
             </div>
         </div>
-        <!-- Right Panel: Aggregated Responses -->
+        <!-- Right Panel -->
         <div class="right-panel">
             <h1>UK Public Sentiment</h1>
             <div class="stats">
@@ -29,7 +29,7 @@
             <div id="bubble-container"></div>
         </div>
     </div>
-    <!-- Your JavaScript File -->
+    <!-- Load script.js LAST -->
     <script src="script.js"></script>
 </body>
 </html>

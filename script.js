@@ -1,4 +1,4 @@
-// Your Firebase Configuration
+// Firebase Configuration
 const firebaseConfig = {
     apiKey: "AIzaSyBImTB7fyMBzhY0etBFlrT89IoIo50SK0Q",
     authDomain: "politics-chatbot.firebaseapp.com",
@@ -18,7 +18,7 @@ const database = firebase.database();
 let username = "";
 document.addEventListener("DOMContentLoaded", () => {
     while (!username) {
-        username = prompt("Enter a username to start:");
+        username = prompt("Enter a username to start the chat:");
         if (!username) alert("Username cannot be empty!");
     }
 });
@@ -28,26 +28,20 @@ function sendMessage() {
     const userInput = document.getElementById("user-input").value.trim();
     if (!userInput) return;
 
-    // Save message to Firebase
+    // Save the message to Firebase
     const userRef = database.ref("responses/" + username);
     userRef.push({
         message: userInput,
         timestamp: Date.now()
     });
 
-    // Display user message
+    // Display message
     const chatWindow = document.getElementById("chat-window");
     chatWindow.innerHTML += `<p><strong>You:</strong> ${userInput}</p>`;
-
-    // Example bot response
-    const botResponse = "Thank you for sharing!";
-    chatWindow.innerHTML += `<p><strong>Bot:</strong> ${botResponse}</p>`;
-
-    // Clear input field
     document.getElementById("user-input").value = "";
 }
 
-// Function to display aggregated data dynamically
+// Function to aggregate data
 function displayAggregatedData() {
     const bubbleContainer = document.getElementById("bubble-container");
     const topics = {};
@@ -70,15 +64,14 @@ function displayAggregatedData() {
         bubbleContainer.innerHTML = "";
         for (let topic in topics) {
             const size = 50 + topics[topic] * 20;
-            const bubble = `<div class="bubble" style="width:${size}px; height:${size}px;">
-                                ${topic} (${topics[topic]})
-                            </div>`;
-            bubbleContainer.innerHTML += bubble;
+            bubbleContainer.innerHTML += `<div class="bubble" style="width:${size}px; height:${size}px;">
+                                            ${topic} (${topics[topic]})
+                                          </div>`;
         }
 
         document.getElementById("user-count").textContent = Object.keys(data).length;
     });
 }
 
-// Initialize aggregated data function
+// Initialize display
 displayAggregatedData();
