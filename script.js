@@ -14,11 +14,11 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
-// Prompt for username when the page loads
+// Prompt for username
 let username = "";
 document.addEventListener("DOMContentLoaded", () => {
     while (!username) {
-        username = prompt("Enter a username to start the chat:");
+        username = prompt("Enter a username to start:");
         if (!username) alert("Username cannot be empty!");
     }
 });
@@ -52,12 +52,10 @@ function displayAggregatedData() {
     const bubbleContainer = document.getElementById("bubble-container");
     const topics = {};
 
-    // Fetch data from Firebase
     database.ref("responses").on("value", (snapshot) => {
         const data = snapshot.val();
         if (!data) return;
 
-        // Analyze and count keywords in responses
         for (let user in data) {
             for (let response in data[user]) {
                 const message = data[user][response].message.toLowerCase();
@@ -69,20 +67,18 @@ function displayAggregatedData() {
             }
         }
 
-        // Update the bubble visualization
         bubbleContainer.innerHTML = "";
         for (let topic in topics) {
-            const size = 50 + topics[topic] * 20; // Dynamic bubble size
+            const size = 50 + topics[topic] * 20;
             const bubble = `<div class="bubble" style="width:${size}px; height:${size}px;">
                                 ${topic} (${topics[topic]})
                             </div>`;
             bubbleContainer.innerHTML += bubble;
         }
 
-        // Update live user count
         document.getElementById("user-count").textContent = Object.keys(data).length;
     });
 }
 
-// Call the function to display aggregated data
+// Initialize aggregated data function
 displayAggregatedData();
