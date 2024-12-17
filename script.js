@@ -25,7 +25,7 @@ function generateUniqueUsername() {
     return `User${randomId}`;
 }
 
-// Prompt for username and update the title
+// Prompt for username and update the existing header
 let username = "";
 document.addEventListener("DOMContentLoaded", () => {
     console.log("Document loaded. Prompting for username...");
@@ -38,9 +38,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     console.log("Username set to:", username);
 
-    // Update the title dynamically
-    const chatTitle = document.getElementById("chat-title");
-    chatTitle.textContent = `${username} chatting with Political Representative`;
+    // Update the existing h1 element in the left panel
+    const leftPanelTitle = document.querySelector(".left-panel h1");
+    if (leftPanelTitle) {
+        leftPanelTitle.textContent = `${username} chatting with Political Representative`;
+        console.log("Title updated successfully.");
+    } else {
+        console.error("Left panel title not found.");
+    }
 });
 
 // Function to send a message
