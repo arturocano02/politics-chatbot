@@ -21,15 +21,16 @@ console.log("Firebase initialized successfully.");
 
 // Function to generate a unique username
 function generateUniqueUsername(baseName) {
-    const randomId = Math.floor(1000 + Math.random() * 9000); // Generate a random 4-digit number
+    const randomId = Math.floor(1000 + Math.random() * 9000);
     return `${baseName}${randomId}`;
 }
 
-// Prompt for username and create a unique username
+// Prompt for username and update the title
 let username = "";
 let displayUsername = "";
 document.addEventListener("DOMContentLoaded", () => {
     console.log("Document loaded. Prompting for username...");
+
     while (!username) {
         username = prompt("Enter your name to start the chat:");
         if (!username || username.trim() === "") {
@@ -38,17 +39,17 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Generate a unique username and display it
+    // Generate a unique username
     displayUsername = generateUniqueUsername(username.trim());
     console.log("Unique username generated:", displayUsername);
 
     // Update the left panel title
-    const leftPanelTitle = document.querySelector(".left-panel h1");
-    if (leftPanelTitle) {
-        leftPanelTitle.textContent = `${displayUsername} chatting with Political Representative`;
-        console.log("Title updated to:", leftPanelTitle.textContent);
+    const chatTitle = document.getElementById("chat-title");
+    if (chatTitle) {
+        chatTitle.textContent = `${displayUsername} chatting with Political Representative`;
+        console.log("Title updated to:", chatTitle.textContent);
     } else {
-        console.error("Left panel title element not found.");
+        console.error("Failed to find chat-title element.");
     }
 });
 
@@ -78,9 +79,8 @@ function sendMessage() {
     document.getElementById("user-input").value = "";
 }
 
-// Function to display aggregated data
+// Display aggregated data
 function displayAggregatedData() {
-    console.log("Fetching aggregated data from Firebase...");
     const bubbleContainer = document.getElementById("bubble-container");
     const topics = {};
 
@@ -101,9 +101,6 @@ function displayAggregatedData() {
             }
         }
 
-        console.log("Processed topics:", topics);
-
-        // Update bubbles
         bubbleContainer.innerHTML = "";
         for (let topic in topics) {
             const size = 50 + topics[topic] * 20;
@@ -113,7 +110,6 @@ function displayAggregatedData() {
         }
 
         document.getElementById("user-count").textContent = Object.keys(data).length;
-        console.log("User count updated:", Object.keys(data).length);
     });
 }
 
