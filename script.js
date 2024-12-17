@@ -19,15 +19,14 @@ if (!firebase.apps.length) {
 const database = firebase.database();
 console.log("Firebase initialized successfully.");
 
-// Function to generate a unique username
+// Function to generate unique username
 function generateUniqueUsername(baseName) {
     const randomId = Math.floor(1000 + Math.random() * 9000);
     return `${baseName}${randomId}`;
 }
 
-// Prompt for username and update the title
+// Username setup
 let username = "";
-let displayUsername = "";
 document.addEventListener("DOMContentLoaded", () => {
     console.log("Document loaded. Prompting for username...");
 
@@ -39,78 +38,57 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Generate a unique username
-    displayUsername = generateUniqueUsername(username.trim());
-    console.log("Unique username generated:", displayUsername);
+    username = generateUniqueUsername(username.trim());
+    console.log("Generated Username:", username);
 
-    // Update the left panel title
-    const chatTitle = document.getElementById("chat-title");
-    if (chatTitle) {
-        chatTitle.textContent = `${displayUsername} chatting with Political Representative`;
-        console.log("Title updated to:", chatTitle.textContent);
-    } else {
-        console.error("Failed to find chat-title element.");
-    }
+    // Update Firebase user count
+    database.ref("responses/" + username).set({
+        initialized: true
+    }).then(() => {
+        console.log("Firebase initialized for user:", username);
+
+        // Update the left panel title
+        const chatTitle = document.getElementById("chat-title");
+        if (chatTitle) {
+            chatTitle.textContent = `${username} chatting with Political Representative`;
+            console.log("Title updated successfully.");
+        } else {
+            console.error("Left panel title not found.");
+        }
+    }).catch((error) => {
+        console.error("Error initializing Firebase for user:", error);
+    });
 });
 
-// Function to send a message
+// Send message
 function sendMessage() {
     const userInput = document.getElementById("user-input").value.trim();
-    console.log("Send button clicked. User input:", userInput);
 
     if (!userInput) {
-        console.warn("Input is empty. No message sent.");
+        console.warn("Empty message, not sent.");
         return;
     }
 
-    console.log("Saving message to Firebase...");
-    database.ref("responses/" + displayUsername).push({
+    database.ref("responses/" + username).push({
         message: userInput,
         timestamp: Date.now()
     }).then(() => {
-        console.log("Message saved successfully.");
+        console.log("Message sent:", userInput);
+
+        // Append to chat window
+        const chatWindow = document.getElementById("chat-window");
+        chatWindow.innerHTML += `<p><strong>You:</strong> ${userInput}</p>`;
+        document.getElementById("user-input").value = "";
     }).catch((error) => {
-        console.error("Error saving message:", error);
-    });
-
-    // Display message
-    const chatWindow = document.getElementById("chat-window");
-    chatWindow.innerHTML += `<p><strong>You:</strong> ${userInput}</p>`;
-    document.getElementById("user-input").value = "";
-}
-
-// Display aggregated data
-function displayAggregatedData() {
-    const bubbleContainer = document.getElementById("bubble-container");
-    const topics = {};
-
-    database.ref("responses").on("value", (snapshot) => {
-        const data = snapshot.val();
-        console.log("Data received from Firebase:", data);
-
-        if (!data) return;
-
-        for (let user in data) {
-            for (let response in data[user]) {
-                const message = data[user][response].message.toLowerCase();
-                ["economy", "healthcare", "education", "environment"].forEach(topic => {
-                    if (message.includes(topic)) {
-                        topics[topic] = (topics[topic] || 0) + 1;
-                    }
-                });
-            }
-        }
-
-        bubbleContainer.innerHTML = "";
-        for (let topic in topics) {
-            const size = 50 + topics[topic] * 20;
-            bubbleContainer.innerHTML += `<div class="bubble" style="width:${size}px; height:${size}px;">
-                                            ${topic} (${topics[topic]})
-                                          </div>`;
-        }
-
-        document.getElementById("user-count").textContent = Object.keys(data).length;
+        console.error("Error sending message:", error);
     });
 }
 
-displayAggregatedData();
+// Fetch user count
+database.ref("responses").on("value", (snapshot) => {
+    const data = snapshot.val();
+    const userCount = data ? Object.keys(data).length : 0;
+
+    console.log("Current user count:", userCount);
+    document.getElementById("user-count").textContent = userCount;
+});
