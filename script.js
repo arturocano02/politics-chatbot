@@ -10,68 +10,75 @@ const firebaseConfig = {
     measurementId: "G-M8YR67RG2V"
 };
 
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-const database = firebase.database();
-
-// Prompt for username
-let username = "";
+// Ensure Firebase is initialized once the page loads
 document.addEventListener("DOMContentLoaded", () => {
+    // Check if Firebase is already initialized
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+        console.log("Firebase initialized successfully!");
+    }
+
+    const database = firebase.database();
+
+    // Prompt for username
+    let username = "";
     while (!username) {
         username = prompt("Enter a username to start the chat:");
         if (!username) alert("Username cannot be empty!");
     }
-});
 
-// Function to send a message
-function sendMessage() {
-    const userInput = document.getElementById("user-input").value.trim();
-    if (!userInput) return;
+    // Function to send a message
+    window.sendMessage = function () {
+        const userInput = document.getElementById("user-input").value.trim();
+        if (!userInput) return;
 
-    // Save the message to Firebase
-    const userRef = database.ref("responses/" + username);
-    userRef.push({
-        message: userInput,
-        timestamp: Date.now()
-    });
+        // Save the message to Firebase
+        const userRef = database.ref("responses/" + username);
+        userRef.push({
+            message: userInput,
+            timestamp: Date.now()
+        });
 
-    // Display message
-    const chatWindow = document.getElementById("chat-window");
-    chatWindow.innerHTML += `<p><strong>You:</strong> ${userInput}</p>`;
-    document.getElementById("user-input").value = "";
-}
+        // Display user message
+        const chatWindow = document.getElementById("chat-window");
+        chatWindow.innerHTML += `<p><strong>You:</strong> ${userInput}</p>`;
 
-// Function to aggregate data
-function displayAggregatedData() {
-    const bubbleContainer = document.getElementById("bubble-container");
-    const topics = {};
+        // Clear input field
+        document.getElementById("user-input").value = "";
+    };
 
-    database.ref("responses").on("value", (snapshot) => {
-        const data = snapshot.val();
-        if (!data) return;
+    // Function to display aggregated data dynamically
+    function displayAggregatedData() {
+        const bubbleContainer = document.getElementById("bubble-container");
+        const topics = {};
 
-        for (let user in data) {
-            for (let response in data[user]) {
-                const message = data[user][response].message.toLowerCase();
-                ["economy", "healthcare", "education", "environment"].forEach(topic => {
-                    if (message.includes(topic)) {
-                        topics[topic] = (topics[topic] || 0) + 1;
-                    }
-                });
+        database.ref("responses").on("value", (snapshot) => {
+            const data = snapshot.val();
+            if (!data) return;
+
+            for (let user in data) {
+                for (let response in data[user]) {
+                    const message = data[user][response].message.toLowerCase();
+                    ["economy", "healthcare", "education", "environment"].forEach(topic => {
+                        if (message.includes(topic)) {
+                            topics[topic] = (topics[topic] || 0) + 1;
+                        }
+                    });
+                }
             }
-        }
 
-        bubbleContainer.innerHTML = "";
-        for (let topic in topics) {
-            const size = 50 + topics[topic] * 20;
-            bubbleContainer.innerHTML += `<div class="bubble" style="width:${size}px; height:${size}px;">
-                                            ${topic} (${topics[topic]})
-                                          </div>`;
-        }
+            bubbleContainer.innerHTML = "";
+            for (let topic in topics) {
+                const size = 50 + topics[topic] * 20;
+                bubbleContainer.innerHTML += `<div class="bubble" style="width:${size}px; height:${size}px;">
+                                                ${topic} (${topics[topic]})
+                                              </div>`;
+            }
 
-        document.getElementById("user-count").textContent = Object.keys(data).length;
-    });
-}
+            document.getElementById("user-count").textContent = Object.keys(data).length;
+        });
+    }
 
-// Initialize display
-displayAggregatedData();
+    // Call the function to display data
+    displayAggregatedData();
+});
