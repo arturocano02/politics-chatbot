@@ -12,23 +12,18 @@ const firebaseConfig = {
     measurementId: "G-M8YR67RG2V"
 };
 
-// Debugging: Check if Firebase is loaded
-if (typeof firebase === "undefined") {
-    console.error("Firebase is not loaded. Check the script order.");
-} else {
-    console.log("Firebase object is available.");
-}
-
 // Initialize Firebase
-try {
+if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
-    console.log("Firebase initialized successfully.");
-} catch (error) {
-    console.error("Firebase initialization error:", error);
 }
-
 const database = firebase.database();
-console.log("Firebase database initialized.");
+console.log("Firebase initialized successfully.");
+
+// Generate a unique username
+function generateUniqueUsername() {
+    const randomId = Math.floor(1000 + Math.random() * 9000); // Generate random 4-digit number
+    return `User${randomId}`;
+}
 
 // Prompt for username
 let username = "";
@@ -36,9 +31,17 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("Document loaded. Prompting for username...");
     while (!username) {
         username = prompt("Enter a username to start the chat:");
-        if (!username) console.warn("Username is empty. Prompting again...");
+        if (!username) {
+            username = generateUniqueUsername();
+            alert(`No username entered. Your username is: ${username}`);
+        }
     }
     console.log("Username set to:", username);
+
+    // Update the title with the username
+    const leftPanelTitle = document.createElement("h2");
+    leftPanelTitle.textContent = `${username} chatting with Political Representative`;
+    document.querySelector(".left-panel").prepend(leftPanelTitle);
 });
 
 // Function to send a message
