@@ -19,32 +19,36 @@ if (!firebase.apps.length) {
 const database = firebase.database();
 console.log("Firebase initialized successfully.");
 
-// Generate a unique username
-function generateUniqueUsername() {
-    const randomId = Math.floor(1000 + Math.random() * 9000);
-    return `User${randomId}`;
+// Function to generate a unique username
+function generateUniqueUsername(baseName) {
+    const randomId = Math.floor(1000 + Math.random() * 9000); // Generate a random 4-digit number
+    return `${baseName}${randomId}`;
 }
 
-// Prompt for username and update the existing header
+// Prompt for username and create a unique username
 let username = "";
+let displayUsername = "";
 document.addEventListener("DOMContentLoaded", () => {
     console.log("Document loaded. Prompting for username...");
     while (!username) {
-        username = prompt("Enter a username to start the chat:");
-        if (!username) {
-            username = generateUniqueUsername();
-            alert(`No username entered. Your username is: ${username}`);
+        username = prompt("Enter your name to start the chat:");
+        if (!username || username.trim() === "") {
+            alert("Name cannot be empty!");
+            username = null;
         }
     }
-    console.log("Username set to:", username);
 
-    // Update the existing h1 element in the left panel
+    // Generate a unique username and display it
+    displayUsername = generateUniqueUsername(username.trim());
+    console.log("Unique username generated:", displayUsername);
+
+    // Update the left panel title
     const leftPanelTitle = document.querySelector(".left-panel h1");
     if (leftPanelTitle) {
-        leftPanelTitle.textContent = `${username} chatting with Political Representative`;
-        console.log("Title updated successfully.");
+        leftPanelTitle.textContent = `${displayUsername} chatting with Political Representative`;
+        console.log("Title updated to:", leftPanelTitle.textContent);
     } else {
-        console.error("Left panel title not found.");
+        console.error("Left panel title element not found.");
     }
 });
 
@@ -59,7 +63,7 @@ function sendMessage() {
     }
 
     console.log("Saving message to Firebase...");
-    database.ref("responses/" + username).push({
+    database.ref("responses/" + displayUsername).push({
         message: userInput,
         timestamp: Date.now()
     }).then(() => {
