@@ -82,10 +82,11 @@ body {
     background-color: #007bff;
     color: #fff;
     text-align: center;
-    line-height: 1.2;
     position: relative;
     margin: 10px;
     display: flex;
     justify-content: center;
     align-items: center;
+    line-height: 1.2;
+    font-weight: bold;
 }
